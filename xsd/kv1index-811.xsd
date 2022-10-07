@@ -10,7 +10,7 @@
 <!--            in de index kan worden afgeleid of een vorige KV1 set volledig of deels wordt vervangen of naast een voorgaande set    -->
 <!--            geldig blijft.                                                                                                         -->
 <!--                                                                                                                                   -->
-<!-- Versie:  8.1.0a (januari 2020)                                                                                                    -->
+<!-- Versie:  8.1.1 (maart 2022)                                                                                                    -->
 <!--                                                                                                                                   -->
 <!-- Historie:                                                                                                                         -->
 <!--          0.4: initiële versie XSD, gebaseerd op versie zoals besproken in Bison WA op 1 oktober 2015                              -->
@@ -23,9 +23,10 @@
 <!--                                                                                                                                   -->
 <!--        8.1.0: Root structuur die alle setgeldigheidsperiodes bevat.                                                               -->
 <!--        8.1.0a: Copyright aangepast.                                                                                               -->
+<!--        8.1.1: Verwijzing naar bijbehorende NeTEx-levering toegevoegd.                                                             -->
 <!--                                                                                                                                   -->
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tmi8="http://bison.connekt.nl/tmi8/kv1/msg" targetNamespace="http://bison.connekt.nl/tmi8/kv1/msg" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tmi8="http://bison.connekt.nl/tmi8/kv1/msg" targetNamespace="http://bison.connekt.nl/tmi8/kv1/msg" elementFormDefault="qualified" version="8.1.1">
 	<!-- KV1 index -->
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 	<!-- KV1 index wordt (optioneel) gelijktijdig met een KV1 dataset aangeleverd.                                     -->
@@ -40,7 +41,7 @@
 	<!-- Sleutel van een setgeldigheidsperiode: DataOwnerCode + setcode + index + versie                               -->
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 	<!-- Het vastleggen van lijnen bij setgeldigheidsperiode is optioneel bij aanleveren                               -->
-	<!-- van een kv1 baseline en verplicht bij KV1-planning delta om te bepalen op                                     -->
+	<!-- van een KV1 baseline en verplicht bij KV1-planning delta om te bepalen op                                     -->
 	<!-- welke lijnen de delta planning betrekking heeft.                                                              -->
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -66,7 +67,7 @@
 	<xs:element name="setgeldigheidsperiode">
 		<xs:annotation>
 			<xs:documentation xml:lang="nl">
-				De gegevens van één KV1-set (en de bijbehorende PPT-set).
+				De gegevens van één KV1-set (en de bijbehorende PPT-set en evt. NeTEx-levering).
 			</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
@@ -83,7 +84,7 @@
 				<xs:sequence minOccurs="0">
 					<xs:annotation>
 						<xs:documentation xml:lang="nl">
-							De verwijzing naar een KV1-set.
+							Verwijzing naar een KV1-set.
 						</xs:documentation>
 					</xs:annotation>
 					<xs:element ref="tmi8:zipfile"/>
@@ -93,7 +94,22 @@
 				<xs:sequence minOccurs="0">
 					<xs:annotation>
 						<xs:documentation xml:lang="nl">
-							De verwijzing naar een PPT-set.
+							Verwijzing naar de bijbehorende NeTEx-levering.
+						</xs:documentation>
+					</xs:annotation>
+					<xs:element ref="tmi8:netexfile" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>
+								Meer dan één alleen in het geval van NeTEx-lijnleveringen!
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element ref="tmi8:netexversie"/>
+				</xs:sequence>
+				<xs:sequence minOccurs="0">
+					<xs:annotation>
+						<xs:documentation xml:lang="nl">
+							Verwijzing naar de bijbehorende PPT-set.
 						</xs:documentation>
 					</xs:annotation>
 					<xs:element ref="tmi8:pptfile"/>
@@ -206,7 +222,7 @@
 	<xs:element name="kv1dossier" type="tmi8:dossierType">
 		<xs:annotation>
 			<xs:documentation xml:lang="nl">
-				Versienummer van het BISON KV1 koppelvlak (drie niveaus: [major].[minor].[fix]). Dit versienummer wordt gebruikt om KV1-data met de juiste definitie te valideren en in te laden.
+				Versienummer van het BISON KV1 koppelvlak (drie niveaus: [major].[minor].[fix]). Dit versienummer wordt gebruikt om de KV1-data met de juiste definitie te valideren en in te laden.
 			</xs:documentation>
 		</xs:annotation>
 	</xs:element>
@@ -214,6 +230,20 @@
 		<xs:annotation>
 			<xs:documentation xml:lang="nl">
 				De gebruikte KV1 variant: "rijtijdgroepen" (geel) of "passeertijden" (blauw).
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="netexfile" type="tmi8:fileType">
+		<xs:annotation>
+			<xs:documentation xml:lang="nl">
+				Dit is de verwijzing naar de bestandsnaam van het ZIP-bestand. Conventie: NeTEx_[domein]_[partitie](_[lijnnr])_[pubdatum]_[ingangsdatum]_[eigen info].zip. Het gedeelte "_[eigen info]" is optioneel; het gedeelte "_[lijnnr]" is alleen relevant voor lijnleveringen.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="netexversie" type="tmi8:dossierType">
+		<xs:annotation>
+			<xs:documentation xml:lang="nl">
+				Versienummer van het NL NeTEx Profiel (drie niveaus: [major].[minor].[fix]). Dit versienummer wordt gebruikt om de NeTEx-data met de juiste definitie te valideren en in te laden.
 			</xs:documentation>
 		</xs:annotation>
 	</xs:element>
@@ -227,7 +257,7 @@
 	<xs:element name="pptdossier" type="tmi8:dossierType">
 		<xs:annotation>
 			<xs:documentation xml:lang="nl">
-				Versienummer van het BISON PPT koppelvlak (drie niveaus: [major].[minor].[fix]). Dit versienummer wordt gebruikt om PPT-data met de juiste definitie te valideren en in te laden.
+				Versienummer van het BISON PPT koppelvlak (drie niveaus: [major].[minor].[fix]). Dit versienummer wordt gebruikt om de PPT-data met de juiste definitie te valideren en in te laden.
 			</xs:documentation>
 		</xs:annotation>
 	</xs:element>
